@@ -195,7 +195,11 @@ export default function ChatPage() {
           type: recipes.length > 0 ? "recommendation" : "text",
           content:
             recipes.length > 0
-              ? { recipes, source: "difficulty-time" }
+              ? { 
+                  recipes, 
+                  source: "difficulty-time",
+                  filterCondition: { difficulty, maxTime, cookTime: cookTimeString }
+                }
               : `${difficulty || ""} ${cookTimeString
                 ? `(조리 시간: ${cookTimeString})`
                 : maxTime
@@ -236,7 +240,15 @@ export default function ChatPage() {
           sender: "bot",
           type: recipes.length > 0 ? "recommendation" : "text",
           content:
-            recipes.length > 0 ? { recipes, source: "difficulty-time" } : "더 이상 추천할 레시피가 없어요!",
+            recipes.length > 0 ? { 
+              recipes, 
+              source: "difficulty-time",
+              filterCondition: {
+                difficulty: lastFilterCondition.difficulty,
+                maxTime: lastFilterCondition.maxTime,
+                cookTime: lastFilterCondition.cookTime
+              }
+            } : "더 이상 추천할 레시피가 없어요!",
           time: getCurrentTime(),
         };
 
@@ -451,7 +463,20 @@ export default function ChatPage() {
                         {msg.content.recipes.map((recipe) => {
                           let emoji = "🍽️"; // 기본값
 
-                          if (msg.content.source === "difficulty-time") emoji = "⏱️";
+                          if (msg.content.source === "difficulty-time") {
+                            // 메시지에 저장된 필터 조건 사용
+                            const filterCondition = msg.content.filterCondition || {};
+                            const hasDifficulty = filterCondition.difficulty;
+                            const hasTime = filterCondition.maxTime || filterCondition.cookTime;
+                            
+                            if (hasDifficulty && !hasTime) {
+                              emoji = "🍳"; // 난이도만 있는 경우
+                            } else if (hasTime && !hasDifficulty) {
+                              emoji = "⏱️"; // 시간만 있는 경우
+                            } else {
+                              emoji = "🍳"; // 둘 다 있거나 기타의 경우 시간 우선
+                            }
+                          }
 
                           return (
                             <li key={recipe.id} className="flex items-start">
