@@ -174,9 +174,6 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
 
         ingredients_list = result["parsed"].get("ingredients", [])
 
-        #print(f"\n GPT 응답 #{attempts+1} for '{sub}':")
-        #print(json.dumps(result["parsed"], ensure_ascii=False, indent=2))
-
         for i in ingredients_list:
             if ":" not in i:
                 continue
@@ -197,8 +194,6 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
 
         attempts += 1
 
-    #print(f"\n 최종 대체안 for '{sub}': {collected_raw if collected_raw else '없음'}")
-
     if not collected_raw:
         original_amount = next(
             (i.split(":", 1)[1].strip() for i in req.ingredients if i.startswith(sub + ":")),
@@ -215,9 +210,6 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
 @router.post("/substitute")
 async def recommend_substitute(req: SubstituteRequest):
     try:
-        #print(" 받은 요청 데이터:")
-        #print("substitutes:", req.substitutes)
-
         # GPT에 개별 비동기 요청
         tasks = [async_get_substitute(sub, req) for sub in req.substitutes]
         results = await asyncio.gather(*tasks)
@@ -253,9 +245,6 @@ async def recommend_substitute(req: SubstituteRequest):
         final_result = {
             "ingredients": merged_ingredients
         }
-
-        #print("\n 최종 응답 내용:")
-        #print(json.dumps(final_result, ensure_ascii=False, indent=2))
 
         return {"result": final_result}
 

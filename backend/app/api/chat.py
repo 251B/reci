@@ -23,5 +23,4 @@ async def search_recipes(ingredient: str = Query(..., description="검색할 재
         return {"recipes": recipes}
 
     except Exception as e:
-        print("검색 오류:", e)
         return {"recipes": [], "error": str(e)}

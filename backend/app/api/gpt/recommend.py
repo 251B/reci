@@ -42,14 +42,11 @@ async def recommend_recipe(req: PromptRequest):
         )
 
         result_line = response.choices[0].message.content.strip()
-        print("GPT 응답 결과:", result_line)
 
         if result_line == "이전 재료 사용":
             ingredients = req.previous_ingredients
         else:
             ingredients = [i.strip() for i in result_line.split(",") if i.strip()]
-
-        print("최종 추출된 재료 리스트:", ingredients)
 
         if not ingredients:
             return {

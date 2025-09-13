@@ -9,7 +9,6 @@ async def search_by_title(
     page: int = Query(1),
     per_page: int = Query(8)
 ):
-    print(f"검색 실행됨 | q={q}, page={page}, per_page={per_page}")
     try:
         result = client.collections["recipes"].documents.search({
             "q": q,
@@ -17,8 +16,6 @@ async def search_by_title(
             "page": page,
             "per_page": per_page
         })
-
-        print("Raw result from Typesense:", result)
 
         recipes = [
             {
@@ -31,5 +28,4 @@ async def search_by_title(
 
         return {"recipes": recipes}
     except Exception as e:
-        print(" 에러 발생:", e)
         return {"recipes": [], "error": str(e)}
