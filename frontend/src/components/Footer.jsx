@@ -18,7 +18,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full bg-[#FDA177] text-white flex justify-around items-center py-3">
+    <footer className="w-full max-w-[430px] mx-auto bg-[#FDA177] text-white flex justify-around items-center py-3">
       <button
         onClick={goToBookmarks}
         className={`flex flex-col items-center text-xs ${isActive("/bookmarks") ? "opacity-100" : "opacity-80"}`}
