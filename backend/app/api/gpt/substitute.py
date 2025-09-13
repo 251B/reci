@@ -60,6 +60,8 @@ def build_prompt(req: SubstituteRequest, strict=False):
         f"2. 여러 대체안은 '|'로 구분하세요\n"
         f"3. 대체가 어려우면 '생략 가능' 또는 '대체 불가'로 표시하세요\n"
         f"4. 요리의 맛과 질감을 고려한 현실적인 대체안을 제시하세요\n"
+        f"5. **중복된 재료는 절대 제시하지 마세요** (예: 마늘가루를 두 번 제시하면 안됨)\n"
+        f"6. 서로 다른 재료를 제시하세요 (마늘가루, 생강, 양파 등)\n"
     )
     return prompt
 
@@ -77,12 +79,12 @@ def normalize_parentheses(val: str) -> str:
 async def get_substitute_response(req: SubstituteRequest, strict=False):
     prompt = build_prompt(req, strict)
     response = await client.chat.completions.create(
-        model="gpt-4o-mini",  # 더 정확한 모델 사용
+        model="gpt-3.5-turbo",  
         messages=[
             {"role": "system", "content": "당신은 한국 요리 전문가입니다. 한국인의 입맛과 일반적인 한국 가정의 재료 보유 현황을 잘 알고 있습니다."},
             {"role": "user", "content": prompt},
         ],
-        temperature=0.7,  # 창의성과 정확성의 균형
+        temperature=0.7, 
         max_tokens=2000,
     )
     content = response.choices[0].message.content.strip()
@@ -120,7 +122,6 @@ async def async_request_final_judgment(ingredient: str, amount: str, steps: list
 
 async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, str]:
     collected_raw = []
-    collected_keys = set()
     max_attempts = 6  # 더 많은 시도로 품질 향상
     attempts = 0
 
@@ -130,10 +131,38 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
         return bool(pattern.search(value))
 
     def normalize_key(text: str) -> str:
-        text = text.lower()
-        text = re.sub(r"\([^)]*\)", "", text)          
-        text = re.sub(r"[\d\s\+\-mlgTt/:]+", "", text)  
+        # 재료명만 추출하여 중복 체크 (양과 단위는 유지)
+        text = text.lower().strip()
+        text = re.sub(r"\([^)]*\)", "", text)  # 괄호 제거
+        
+        # 일반적인 단위들을 기준으로 재료명만 추출
+        units = ['큰술', '큰스푼', 't', 'T', '작은술', '작은스푼', 'tsp', '개', '쪽', '조각', 'g', 'ml', 'kg', 'l']
+        
+        # 단위 앞의 숫자와 단위를 제거
+        for unit in units:
+            pattern = rf'\s*\d+\.?\d*\s*{re.escape(unit)}\s*'
+            text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+        
+        # 남은 숫자들 제거
+        text = re.sub(r'\d+\.?\d*', '', text)
+        text = re.sub(r'\s+', ' ', text)  # 여러 공백을 하나로
+        
         return text.strip()
+
+    def are_similar_ingredients(ing1: str, ing2: str) -> bool:
+        """두 재료가 비슷한지 확인 (중복 방지용)"""
+        norm1 = normalize_key(ing1)
+        norm2 = normalize_key(ing2)
+        
+        # 정확히 같은 재료명
+        if norm1 == norm2:
+            return True
+            
+        # 하나가 다른 하나를 포함하는 경우 (예: "마늘" vs "마늘가루")
+        if norm1 in norm2 or norm2 in norm1:
+            return True
+            
+        return False
 
     while len(collected_raw) < 3 and attempts < max_attempts:
         result = await get_substitute_response(SubstituteRequest(
@@ -160,9 +189,10 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
             options = [v.strip() for v in val.split("|")]
             for opt in options:
                 if not is_placeholder(opt):
-                    key = normalize_key(opt)
-                    if key not in collected_keys:
-                        collected_keys.add(key)
+                    # 기존에 수집된 재료와 유사한지 확인
+                    is_duplicate = any(are_similar_ingredients(opt, existing) for existing in collected_raw)
+                    
+                    if not is_duplicate:
                         collected_raw.append(opt)
 
         attempts += 1
