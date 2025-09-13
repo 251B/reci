@@ -21,7 +21,8 @@ export const useBookmarks = (userId) => {
       const res = await api.get("/bookmark/", {
         params: { user_id: userId },
       });
-      setBookmarkedIds(res.data.recipe_ids?.map(id => Number(id)) || []);
+      // API 응답 구조: res.data.data.recipe_ids
+      setBookmarkedIds(res.data.data?.recipe_ids?.map(id => Number(id)) || []);
     } catch (err) {
       console.error("찜 목록 불러오기 실패:", err);
     } finally {
