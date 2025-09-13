@@ -1,15 +1,12 @@
-import os
 import typesense
-from dotenv import load_dotenv
-
-load_dotenv()
+from app.config import settings
 
 client = typesense.Client({
     'nodes': [{
-        'host': os.getenv("TYPESENSE_HOST", "localhost"),
-        'port': int(os.getenv("TYPESENSE_PORT", 8108)),  # 기본값 8108
+        'host': settings.TYPESENSE_HOST,
+        'port': settings.TYPESENSE_PORT,
         'protocol': 'http'
     }],
-    'api_key': os.getenv("TYPESENSE_API_KEY", "xyz"),
+    'api_key': settings.TYPESENSE_API_KEY,
     'connection_timeout_seconds': 2
 })

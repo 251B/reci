@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# 설정 import
+from app.config import settings
+
 # DB 초기화
 from app.models import Base, User  
 from app.database import engine
@@ -18,10 +21,7 @@ Base.metadata.create_all(bind=engine)
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",          # PC용
-        "http://192.168.123.175:5173",    # 스마트폰 접속용
-    ], 
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
