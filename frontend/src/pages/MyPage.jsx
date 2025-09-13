@@ -187,7 +187,7 @@ export default function MyPage() {
 
   return (
     <div className="flex flex-col min-h-screen items-center bg-[#f7f8fa]">
-      <div className="w-full max-w-md flex-grow pb-28 pb-[env(safe-area-inset-bottom)]">
+      <div className="w-full max-w-md flex-grow pb-[calc(60px+env(safe-area-inset-bottom))]">
         <Header title="마이페이지" showBack onBack={() => navigate(-1)} />
         {isLoggedIn ? (
           <div className="p-6 flex flex-col gap-4">
@@ -328,7 +328,7 @@ export default function MyPage() {
             {isLoggedIn && (
         <button
           onClick={handleLogout}
-          className="text-xs text-red-400 underline my-4 self-center"
+          className="text-xs text-red-400 underline my-2 self-center"
         >
           로그아웃
         </button>
