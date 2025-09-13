@@ -74,7 +74,7 @@ export default function BookmarkPage() {
                   <img
                     src={recipe.image_url}
                     alt={recipe.title}
-                    className="w-20 h-20 object-cover flex-shrink-0 ml-2"
+                    className="w-20 h-20 object-cover flex-shrink-0 ml-2 my-2 rounded-lg"
                   />
                   <div className="flex flex-col justify-center flex-1 px-3 py-2 pr-8">
                     <div className="text-sm font-normal text-gray-800">{recipe.title}</div>
