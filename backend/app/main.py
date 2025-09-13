@@ -32,13 +32,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.info(f"DEBUG: {settings.DEBUG}")
 
-# 로깅 설정
-logging.basicConfig(
-    level=logging.INFO if settings.ENVIRONMENT == "production" else logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-
 # DB 테이블 생성
 Base.metadata.create_all(bind=engine)
 
