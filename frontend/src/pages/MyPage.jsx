@@ -16,6 +16,33 @@ export default function MyPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [recentRecipes, setRecentRecipes] = useState([]);
   const [topIngredients, setTopIngredients] = useState([]);
+
+  const removeIngredient = (ingredientToRemove) => {
+    const updatedIngredients = topIngredients.filter(ingredient => ingredient !== ingredientToRemove);
+    setTopIngredients(updatedIngredients);
+    
+    // localStorage의 레시피 데이터에서 해당 재료의 빈도를 줄여서 저장
+    const stored = localStorage.getItem("longTermHistory");
+    if (stored) {
+      const parsedLong = JSON.parse(stored);
+      const ingredients = parsedLong.flatMap(r => r.ingredients || []);
+      const counts = {};
+      
+      ingredients.forEach((item) => {
+        const name = item.split(":")[0]?.trim();
+        if (name && name !== ingredientToRemove) {
+          counts[name] = (counts[name] || 0) + 1;
+        }
+      });
+      
+      const sorted = Object.entries(counts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 10)
+        .map(([name]) => name);
+      
+      setTopIngredients(sorted);
+    }
+  };
   const [gptRecommendations, setGptRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
@@ -197,18 +224,32 @@ export default function MyPage() {
                 <h3 className="text-base font-semibold mb-2">자주 쓴 재료</h3>
                 <div className="flex flex-wrap gap-2">
                   {topIngredients.map((name, index) => (
-                    <span
+                    <div
                       key={index}
-                      onClick={() =>
-                        navigate("/chat", {
-                          state: { initialMessage: `${name} 들어간 요리 추천해줘` },
-                          replace: true,
-                        })
-                      }
-                      className="px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded-full border border-orange-300 cursor-pointer hover:bg-orange-200"
+                      className="relative inline-flex items-center pl-3 pr-1 py-1 text-sm bg-orange-100 text-orange-700 rounded-full border border-orange-300 hover:bg-orange-200 group"
                     >
-                      {name}
-                    </span>
+                      <span
+                        onClick={() =>
+                          navigate("/chat", {
+                            state: { initialMessage: `${name} 들어간 요리 추천해줘` },
+                            replace: true,
+                          })
+                        }
+                        className="cursor-pointer pr-1"
+                      >
+                        {name}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeIngredient(name);
+                        }}
+                        className="w-4 h-4 flex items-center justify-center text-orange-500 hover:text-orange-700 hover:bg-orange-200 rounded-full transition-colors"
+                        aria-label="재료 삭제"
+                      >
+                        ×
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
