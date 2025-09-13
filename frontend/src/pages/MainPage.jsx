@@ -161,19 +161,26 @@ export default function MainPage() {
                     </span>
                   </button>
                 ))}
+                {/* 챗봇 버튼*/}
+                <button
+                  onClick={() => navigate("/chat")}
+                  className="col-span-2 h-[100px] bg-[#ffffff] hover:bg-[#f8f9fa] transition-all rounded-2xl shadow-md flex items-center justify-start mx-auto"
+                  style={{
+                    gridColumnStart: 2,
+                    gridColumnEnd: 4,
+                    width: 'calc(100% - 24px)'
+                  }}
+                >
+                  <img
+                    src="/images/chat3.png"
+                    alt="챗봇"
+                    className="w-[100px] h-[100px] object-contain mr-3"
+                  />
+                  <span className="text-[15px] font-medium text-[#fc5305]">
+                    AI 챗봇
+                  </span>
+                </button>
               </div>
-            </div>
-          )}
-          {searchText.trim() === "" && (
-            <div
-              onClick={() => navigate("/chat")}
-              className="absolute bottom-4 right-4 w-24 h-24 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform z-50"
-            >
-              <img
-                src="/images/chat.png"
-                alt="챗봇"
-                className="w-24 h-24 object-contain"
-              />
             </div>
           )}
           {showTopBtn && (
