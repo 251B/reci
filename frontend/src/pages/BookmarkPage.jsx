@@ -10,30 +10,45 @@ export default function BookmarkPage() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
+  const fetchBookmarkedRecipes = async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.get("/bookmark/", {
+        params: { user_id: userId },
+      });
+      const ids = res.data.recipe_ids;
+      const recipePromises = ids.map((id) =>
+        api.get(`/recipe/${id}`).then((r) => r.data)
+      );
+      const recipeResults = await Promise.all(recipePromises);
+      setRecipes(recipeResults);
+    } catch (err) {
+      //console.error("찜한 레시피 불러오기 실패:", err);
+      setRecipes([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveBookmark = async (recipeId, e) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    try {
+      await api.delete(`/bookmark/${recipeId}`, {
+        params: { user_id: userId }
+      });
+      // 로컬 상태에서 해당 레시피 제거
+      setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+    } catch (err) {
+      console.error("북마크 삭제 실패:", err);
+      alert("북마크 삭제에 실패했습니다.");
+    }
+  };
+
   useEffect(() => {
     if (!userId) {
       navigate("/login", { replace: true });
       return;
     }
-    const fetchBookmarkedRecipes = async () => {
-      try {
-        setIsLoading(true);
-        const res = await api.get("/bookmark/", {
-          params: { user_id: userId },
-        });
-        const ids = res.data.recipe_ids;
-        const recipePromises = ids.map((id) =>
-          api.get(`/recipe/${id}`).then((r) => r.data)
-        );
-        const recipeResults = await Promise.all(recipePromises);
-        setRecipes(recipeResults);
-      } catch (err) {
-        //console.error("찜한 레시피 불러오기 실패:", err);
-        setRecipes([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchBookmarkedRecipes();
   }, [userId, navigate]);
 
@@ -53,7 +68,7 @@ export default function BookmarkPage() {
               recipes.map((recipe) => (
                 <div
                   key={recipe.id}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer flex items-center"
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer flex items-center relative"
                   onClick={() => navigate(`/recipe/${recipe.id}`)}
                 >
                   <img
@@ -61,9 +76,16 @@ export default function BookmarkPage() {
                     alt={recipe.title}
                     className="w-20 h-20 object-cover flex-shrink-0 ml-2"
                   />
-                  <div className="flex flex-col justify-center flex-1 px-3 py-2">
+                  <div className="flex flex-col justify-center flex-1 px-3 py-2 pr-8">
                     <div className="text-sm font-normal text-gray-800">{recipe.title}</div>
                   </div>
+                  <button
+                    onClick={(e) => handleRemoveBookmark(recipe.id, e)}
+                    className="absolute top-1 right-1 w-6 h-6 text-gray-400 hover:text-red-500 flex items-center justify-center text-lg font-normal transition-colors"
+                    title="북마크 삭제"
+                  >
+                    ×
+                  </button>
                 </div>
               ))
             ) : (
