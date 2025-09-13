@@ -315,16 +315,9 @@ export default function ChatPage() {
           });
 
           const result = res.data.result;
-          const notify = {
-            id: messages.length + 2,
-            sender: "bot",
-            type: "text",
-            content: `다음 재료를 대체했어요: ${substituteTargets.join(", ")}`,
-            time: getCurrentTime(),
-          };
 
           const substituteCard = {
-            id: messages.length + 3,
+            id: messages.length + 2,
             sender: "bot",
             type: "servingsCard",
             content: {
@@ -338,7 +331,7 @@ export default function ChatPage() {
             },
             time: getCurrentTime(),
           };
-          setMessages((prev) => [...prev, notify, substituteCard]);
+          setMessages((prev) => [...prev, substituteCard]);
           return;
         }
       }
@@ -496,12 +489,8 @@ export default function ChatPage() {
                     )}
                   </div>
                 ) : msg.content.adjustedType === "substitute" ? (
-                  //대체재료 추천 카드 UI
-                  <div className="border border-gray-300 bg-white p-4 rounded-xl shadow-sm max-w-[95%]">
-                    <div className="text-base font-bold text-gray-900 mb-1">
-                      {msg.content.title} ({msg.content.serving})
-                    </div>
-                    <div className="text-sm text-gray-800 font-semibold mb-3">📌 사용 가능한 대체안</div>
+                  //대체재료 추천 챗 형태 UI
+                  <div className={`px-4 py-2 text-sm rounded-xl max-w-[75%] whitespace-pre-wrap bg-[#ffcb8c] text-[#7a3e0d] rounded-tl-none mt-1.5`}>
                     {(() => {
                       const substitutedItems = msg.content.substitutedKeys
                         ? msg.content.ingredients.filter(item =>
@@ -509,41 +498,31 @@ export default function ChatPage() {
                         )
                         : msg.content.ingredients;
 
-                      return (
-                        <ul className="list-[circle] list-inside text-sm text-gray-700 space-y-0.5">
-                          {substitutedItems.slice(0, 3).map((item, idx) => {
-                            const [name, optionsStr] = item.split(":");
-                            const options = optionsStr
-                              ? optionsStr.split(/\s*\|\s*/) : [];
+                      let chatText = "";
+                      
+                      substitutedItems.forEach((item, idx) => {
+                        const [name, optionsStr] = item.split(":");
+                        const options = optionsStr
+                          ? optionsStr.split(/\s*\|\s*/) : [];
 
-                            const isProbablyFraction = /^\s*\d+\/\d+/.test(optionsStr);
-                            const isSubstitute = optionsStr?.includes("|") && options.length > 1 && !isProbablyFraction;
+                        const isProbablyFraction = /^\s*\d+\/\d+/.test(optionsStr);
+                        const isSubstitute = optionsStr?.includes("|") && options.length > 1 && !isProbablyFraction;
 
-                            return (
-                              <li key={idx} className="text-sm text-gray-700">
-                                {isSubstitute ? (
-                                  <>
-                                    <span className="font-semibold mr-1">{name.trim()}:</span>
-                                    <div className="ml-2 mt-1 space-y-1">
-                                      {options.map((opt, i) => (
-                                        <div key={i} className="text-xs ml-2 text-gray-700">
-                                          - {opt}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <span className="font-semibold mr-1">{name.trim()}:</span>
-                                    <span>{optionsStr?.trim()}</span>
-                                  </>
-                                )}
-                              </li>
-                            );
-                          })}
+                        if (isSubstitute) {
+                          options.forEach(opt => {
+                            chatText += `📌${opt.trim()}\n`;
+                          });
+                        } else {
+                          chatText += `📌${optionsStr?.trim()}\n`;
+                        }
+                      });
 
-                        </ul>
-                      );
+                      return chatText.trim().split('\n').map((line, i) => (
+                        <span key={i}>
+                          {line}
+                          <br />
+                        </span>
+                      ));
                     })()}
                   </div>
                 ) : (
