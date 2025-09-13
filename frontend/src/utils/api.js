@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const baseURL = API_URL || (isLocalhost
   ? "http://localhost:8000"
-  : "https://yourdomain.com/api"); // 프로덕션 도메인으로 변경 예정
+  : "http://144.24.94.13:8000/api"); // 실제 서버 도메인으로 변경
   
 const api = axios.create({
   baseURL,
