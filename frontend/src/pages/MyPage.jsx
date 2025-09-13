@@ -37,6 +37,7 @@ export default function MyPage() {
         
         {isLoggedIn ? (
           <div className="p-6 flex flex-col gap-4">
+         
             {/* 자주 쓴 재료 */}
             <TopIngredients ingredients={topIngredients} />
 
