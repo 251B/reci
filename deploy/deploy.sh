@@ -24,28 +24,6 @@ fi
 # 환경 변수 파일 생성
 echo "⚙️ 환경 변수 설정 중..."
 
-# Backend 환경 변수
-cat > backend/.env << EOF
-ENVIRONMENT=production
-DEBUG=False
-DATABASE_URL=postgresql://recipick_user:recipick_password@db:5432/recipick_db
-API_HOST=0.0.0.0
-API_PORT=8000
-CORS_ORIGINS=http://$(curl -s ifconfig.me)
-TYPESENSE_HOST=localhost
-TYPESENSE_PORT=8108
-TYPESENSE_API_KEY=recipick-search-key
-OPENAI_API_KEY=your-openai-api-key-here
-SECRET_KEY=$(openssl rand -hex 32)
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-EOF
-
-# Frontend 환경 변수
-cat > frontend/.env.production << EOF
-VITE_API_URL=http://$(curl -s ifconfig.me):8000
-EOF
-
 # Docker 이미지 빌드
 echo "🐳 Docker 이미지 빌드 중..."
 docker-compose down --remove-orphans

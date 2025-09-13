@@ -4,7 +4,7 @@ import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import RecipeCard from "../components/recipe/RecipeCard";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useScrollToTop, useBookmarks, useInfiniteScroll } from "../hooks";
+import { useScrollToTop, useInfiniteScroll } from "../hooks";
 import api from "../utils/api";
 
 export default function MainPage() {
@@ -16,9 +16,7 @@ export default function MainPage() {
   const containerRef = useRef();
   const [showTopBtn, scrollToTop] = useScrollToTop(200);
   
-  // 북마크 훅 사용
-  const userId = localStorage.getItem("userId");
-  const { bookmarkedIds, toggleBookmark, fetchBookmarks } = useBookmarks(userId);
+
   
   // 무한 스크롤 훅 사용
   const fetchMoreResults = useCallback(() => {
@@ -71,11 +69,7 @@ export default function MainPage() {
     fetchResults();
   }, [searchText, page]);
 
-  useEffect(() => {
-    if (userId) {
-      fetchBookmarks();
-    }
-  }, [userId]);
+
 
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -125,8 +119,6 @@ export default function MainPage() {
                 >
                   <RecipeCard
                     recipe={recipe}
-                    isBookmarked={bookmarkedIds.includes(Number(recipe.id))}
-                    onToggleBookmark={toggleBookmark}
                     showCategory={true}
                   />
                 </div>
