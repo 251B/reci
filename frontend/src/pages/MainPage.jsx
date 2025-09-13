@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import RecipeCard from "../components/RecipeCard";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useScrollToTop, useBookmarks, useInfiniteScroll } from "../hooks";
 import api from "../utils/api";
 
 export default function MainPage() {
@@ -11,9 +13,19 @@ export default function MainPage() {
   const [searchResults, setSearchResults] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const observer = useRef();
-  const [showTopBtn, setShowTopBtn] = useState(false);
   const containerRef = useRef();
+  const [showTopBtn, scrollToTop] = useScrollToTop(200);
+  
+  // 북마크 훅 사용
+  const userId = localStorage.getItem("userId");
+  const { bookmarkedIds, toggleBookmark, fetchBookmarks } = useBookmarks(userId);
+  
+  // 무한 스크롤 훅 사용
+  const fetchMoreResults = useCallback(() => {
+    setPage((prev) => prev + 1);
+  }, []);
+  
+  const lastResultRef = useInfiniteScroll(hasMore, fetchMoreResults);
 
   const foodCategories = [
     { name: "밥/죽/떡", icon: "🍚" },
@@ -59,28 +71,13 @@ export default function MainPage() {
     fetchResults();
   }, [searchText, page]);
 
-  const lastResultRef = useCallback(
-    (node) => {
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => prev + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [hasMore]
-  );
-
   useEffect(() => {
-    const handleScroll = () => {
-      setShowTopBtn(window.scrollY > 200);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (userId) {
+      fetchBookmarks();
+    }
+  }, [userId]);
 
-  const scrollToTop = () => {
+  const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (containerRef.current) {
       containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
@@ -125,17 +122,13 @@ export default function MainPage() {
                 <div
                   key={recipe.id}
                   ref={idx === searchResults.length - 1 ? lastResultRef : null}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer"
-                  onClick={() => navigate(`/recipe/${recipe.id}`)}
                 >
-                  <img
-                    src={recipe.image_url}
-                    alt={recipe.title}
-                    className="w-full h-36 object-cover"
+                  <RecipeCard
+                    recipe={recipe}
+                    isBookmarked={bookmarkedIds.includes(Number(recipe.id))}
+                    onToggleBookmark={toggleBookmark}
+                    showCategory={true}
                   />
-                  <div className="text-center text-sm text-gray-700 py-2">
-                    {recipe.title}
-                  </div>
                 </div>
               ))}
             </div>
@@ -178,7 +171,7 @@ export default function MainPage() {
           )}
           {showTopBtn && (
             <button
-              onClick={scrollToTop}
+              onClick={handleScrollToTop}
               className="fixed bottom-20 bg-[#FDA177] text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg z-50 transition hover:bg-[#fc5305]"
               style={{
                 right: 'calc(50% - 238px)',

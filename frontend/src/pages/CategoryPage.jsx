@@ -1,7 +1,9 @@
-import { Search, Heart } from "lucide-react";
+import { Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Header from "../components/Header";
+import RecipeCard from "../components/RecipeCard";
+import { useBookmarks, useScrollToTop, useInfiniteScroll } from "../hooks";
 import api from "../utils/api";
 
 export default function CategoryPage() {
@@ -11,13 +13,28 @@ export default function CategoryPage() {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [bookmarkedIds, setBookmarkedIds] = useState([]);
-  const [showTopBtn, setShowTopBtn] = useState(false);
+  
+  // 북마크 훅 사용
+  const userId = localStorage.getItem("userId");
+  const { bookmarkedIds, toggleBookmark, fetchBookmarks } = useBookmarks(userId);
+  
+  // 스크롤 훅 사용
+  const [showTopBtn, scrollToTop] = useScrollToTop(200);
+
+  // 무한 스크롤 훅 사용
+  const fetchMoreRecipes = useCallback(() => {
+    setPage((prev) => {
+      const next = prev + 1;
+      fetchRecipes(next);
+      return next;
+    });
+  }, []);
+  
+  const lastItemRef = useInfiniteScroll(hasMore, fetchMoreRecipes);
 
   const params = new URLSearchParams(location.search);
   const nameFromQuery = params.get("name");
   const decodedName = nameFromQuery ? decodeURIComponent(nameFromQuery) : "";
-  const userId = localStorage.getItem("userId");
 
   const categoryIconMap = {
     "밥/죽/떡": "🍚",
@@ -38,7 +55,6 @@ export default function CategoryPage() {
   const categoryTitle = `${categoryIcon} ${categoryName}`;
 
   const fetchRecipes = async (pageNum = 1) => {
-
     try {
       const res = await api.get(
         `/category/search?name=${encodeURIComponent(decodedName)}&page=${pageNum}&per_page=8`
@@ -53,43 +69,8 @@ export default function CategoryPage() {
         setHasMore(false);
       }
     } catch (err) {
-      //console.error("카테고리 불러오기 오류:", err);
-    }
-  };
-
-  const fetchBookmarks = async () => {
-    if (!userId) return;
-    try {
-      const res = await api.get("/bookmark/", {
-        params: { user_id: userId },
-      });
-      setBookmarkedIds(res.data.recipe_ids.map(id => Number(id)));
-    } catch (err) {
-      //console.error("찜 목록 불러오기 실패:", err);
-    }
-  };
-
-  const toggleBookmark = async (recipeId) => {
-    if (!userId) {
-      alert("로그인이 필요합니다.");
-      navigate("/login");
-      return;
-    }
-    const isBookmarked = bookmarkedIds.includes(Number(recipeId));
-    try {
-      if (isBookmarked) {
-        await api.delete(`/bookmark/${recipeId}`, {
-          params: { user_id: userId },
-        });
-        setBookmarkedIds((prev) => prev.filter((id) => id !== Number(recipeId)));
-      } else {
-        await api.post(`/bookmark/${recipeId}`, null, {
-          params: { user_id: userId },
-        });
-        setBookmarkedIds((prev) => [...prev, Number(recipeId)]);
-      }
-    } catch (err) {
-      //console.warn("찜 처리 에러:", err.response?.data?.detail);
+      // 카테고리 로딩 실패 시 hasMore를 false로 설정
+      setHasMore(false);
     }
   };
 
@@ -103,36 +84,6 @@ export default function CategoryPage() {
   useEffect(() => {
     fetchBookmarks();
   }, [userId]);
-
-  const observer = useRef();
-  const lastItemRef = useCallback(
-    (node) => {
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => {
-            const next = prev + 1;
-            fetchRecipes(next);
-            return next;
-          });
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [hasMore]
-  );
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowTopBtn(window.scrollY > 200);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const filteredItems = recipes
     .filter(item =>
@@ -165,39 +116,14 @@ export default function CategoryPage() {
             filteredItems.map((item, index) => {
               const isLast = index === filteredItems.length - 1;
               return (
-                <div
-                  key={item.id}
-                  ref={isLast ? lastItemRef : null}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer"
-                  onClick={() =>
-                    navigate(`/recipe/${item.id}`, {
-                      state: { categoryName, categoryIcon },
-                    })
-                  }
-                >
-                  <div className="relative">
-                    <img
-                      src={item.image_url}
-                      alt={item.title}
-                      className="w-full h-36 object-cover"
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleBookmark(item.id);
-                      }}
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
-                    >
-                      <Heart
-                        size={20}
-                        fill={bookmarkedIds.includes(Number(item.id)) ? "red" : "white"}
-                        className={bookmarkedIds.includes(Number(item.id)) ? "text-red-500" : "text-gray-300"}
-                      />
-                    </button>
-                  </div>
-                  <div className="text-center text-sm text-gray-700 py-2 px-2">
-                    {item.title}
-                  </div>
+                <div key={item.id} ref={isLast ? lastItemRef : null}>
+                  <RecipeCard
+                    recipe={item}
+                    isBookmarked={bookmarkedIds.includes(Number(item.id))}
+                    onToggleBookmark={toggleBookmark}
+                    categoryName={categoryName}
+                    categoryIcon={categoryIcon}
+                  />
                 </div>
               );
             })
