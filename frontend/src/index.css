@@ -11,6 +11,8 @@ body {
   background-color: #f2f4f7;
   margin: 0;
   padding: 0;
+  /* 스크롤바로 인한 레이아웃 시프트 방지 */
+  overflow-y: scroll;
 }
 
 #root {

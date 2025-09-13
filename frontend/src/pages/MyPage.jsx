@@ -187,7 +187,7 @@ export default function MyPage() {
 
   return (
     <div className="flex flex-col min-h-screen items-center bg-[#f7f8fa]">
-      <div className="w-full max-w-md flex-grow">
+      <div className="w-full max-w-md flex-grow pb-28 pb-[env(safe-area-inset-bottom)]">
         <Header title="마이페이지" showBack onBack={() => navigate(-1)} />
         {isLoggedIn ? (
           <div className="p-6 flex flex-col gap-4">
@@ -325,6 +325,14 @@ export default function MyPage() {
                 </ul>
               )}
             </div>
+            {isLoggedIn && (
+        <button
+          onClick={handleLogout}
+          className="text-xs text-red-400 underline my-4 self-center"
+        >
+          로그아웃
+        </button>
+      )}
 
           </div>
         ) : (
@@ -344,14 +352,7 @@ export default function MyPage() {
           </div>
         )}
       </div>
-      {isLoggedIn && (
-        <button
-          onClick={handleLogout}
-          className="text-xs text-red-400 underline my-4 self-center"
-        >
-          로그아웃
-        </button>
-      )}
+      
       {selectedMemo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 w-80 shadow-lg relative">
