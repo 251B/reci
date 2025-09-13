@@ -1,8 +1,8 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import RecipeCard from "../components/RecipeCard";
-import LoadingSpinner from "../components/LoadingSpinner";
-import EmptyState from "../components/EmptyState";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
+import RecipeCard from "../components/recipe/RecipeCard";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import EmptyState from "../components/common/EmptyState";
 import { useBookmarks, useBookmarkedRecipes } from "../hooks";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";

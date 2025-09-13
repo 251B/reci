@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import RecipeCard from "../components/RecipeCard";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
+import RecipeCard from "../components/recipe/RecipeCard";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useScrollToTop, useBookmarks, useInfiniteScroll } from "../hooks";
 import api from "../utils/api";

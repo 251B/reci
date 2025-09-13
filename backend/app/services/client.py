@@ -1,5 +1,5 @@
 import typesense
-from app.config import settings
+from app.core.config import settings
 
 client = typesense.Client({
     'nodes': [{

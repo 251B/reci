@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Clock, User, Star, Heart } from "lucide-react";
-import Header from "../components/Header";
-import RecipeTTS from "../components/RecipeTTS";
-import RecipeTimer from "../components/RecipeTimer";
-import RecipeMemo from "../components/RecipeMemo";
-import LoadingSpinner from "../components/LoadingSpinner";
+import Header from "../components/common/Header";
+import RecipeTTS from "../components/recipe/RecipeTTS";
+import RecipeTimer from "../components/recipe/RecipeTimer";
+import RecipeMemo from "../components/recipe/RecipeMemo";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import api from "../utils/api";
 
 function getStarsByDifficulty(difficulty) {

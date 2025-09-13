@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
-from ..dependencies import get_db
+from ..core.dependencies import get_db
 from ..services import AuthService
 from ..schemas import create_success_response
 

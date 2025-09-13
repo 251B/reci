@@ -4,7 +4,7 @@
 """
 from typing import List
 from sqlalchemy.orm import Session
-from ..models import Bookmark
+from ..models.bookmark import Bookmark
 from ..schemas import ConflictException, NotFoundException
 
 

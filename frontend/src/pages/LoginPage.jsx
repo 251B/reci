@@ -1,4 +1,4 @@
-import Header from "../components/Header";
+import Header from "../components/common/Header";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { useState } from "react";

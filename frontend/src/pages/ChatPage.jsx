@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../components/Header";
-import ChatInput from "../components/ChatInput";
-import ChatMessage from "../components/ChatMessage";
-import ChatLoadingIndicator from "../components/ChatLoadingIndicator";
-import ScrollToTopButton from "../components/ScrollToTopButton";
+import Header from "../components/common/Header";
+import ChatInput from "../components/chat/ChatInput";
+import ChatMessage from "../components/chat/ChatMessage";
+import ChatLoadingIndicator from "../components/chat/ChatLoadingIndicator";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 import { useScrollToTop, useTimeUtils, useChatMessages, useRecipeFilters, useRecipeData } from "../hooks";
 import api from "../utils/api";
 

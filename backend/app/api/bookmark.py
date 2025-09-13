@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from ..dependencies import get_db
+from ..core.dependencies import get_db
 from ..services import BookmarkService
 from ..schemas import create_success_response
 

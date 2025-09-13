@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # 설정 import
-from app.config import settings
+from app.core.config import settings
 
 # DB 초기화
-from app.models import Base, User  
-from app.database import engine
+from app.models import User, Bookmark
+from app.core.database import engine, Base
 
 # 라우터 import
 from app.api import auth, chat, category, recipe, title, filter, bookmark

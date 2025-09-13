@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import TopIngredients from "../components/TopIngredients";
-import RecentRecipes from "../components/RecentRecipes";
-import GptRecommendations from "../components/GptRecommendations";
-import MemoSection from "../components/MemoSection";
-import MemoModal from "../components/MemoModal";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
+import TopIngredients from "../components/common/TopIngredients";
+import RecentRecipes from "../components/common/RecentRecipes";
+import GptRecommendations from "../components/common/GptRecommendations";
+import MemoSection from "../components/common/MemoSection";
+import MemoModal from "../components/ui/MemoModal";
 import { 
   useMyPageData, 
   useGptRecommendations, 
