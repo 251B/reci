@@ -38,6 +38,7 @@ export default function ChatPage() {
       ]
   );
   const [inputText, setInputText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
   const hasPostedIntro = useRef(false);
   const [previousIngredients, setPreviousIngredients] = useState([]);
@@ -133,9 +134,11 @@ export default function ChatPage() {
 
   const handleSend = async (text) => {
     const userText = (text ?? inputText).trim();
-    if (!userText) return;
+    if (!userText || isLoading) return;
+    
     setMessages((prev) => [...prev, { id: prev.length + 1, sender: "user", type: "text", content: userText, time: getCurrentTime() }]);
     setInputText("");
+    setIsLoading(true);
 
     try {
       const levelMatch = userText.match(/(초급|중급|고급|아무나)/);
@@ -383,6 +386,8 @@ export default function ChatPage() {
         content: `오류 발생: ${errorMsg}`,
         time: getCurrentTime(),
       }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -410,7 +415,7 @@ export default function ChatPage() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isLoading) {
       e.preventDefault();
       handleSend();
     }
@@ -524,7 +529,6 @@ export default function ChatPage() {
                                         <div key={i} className="text-xs ml-2 text-gray-700">
                                           - {opt}
                                         </div>
-
                                       ))}
                                     </div>
                                   </>
@@ -583,6 +587,24 @@ export default function ChatPage() {
               </div>
             </div>
           ))}
+          
+          {/* 로딩 인디케이터 */}
+          {isLoading && (
+            <div className="flex items-start justify-start mt-1">
+              <img src="/images/chatbot.png" alt="Bot" className="w-12 h-12 rounded-full mr-2" />
+              <div className="px-4 py-2 text-sm rounded-xl bg-[#ffcb8c] text-[#7a3e0d] rounded-tl-none mt-1.5">
+                <div className="flex items-center space-x-1">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-[#7a3e0d] rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-[#7a3e0d] rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-[#7a3e0d] rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                  <span className="text-xs ml-2">답변을 준비하고 있어요...</span>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div ref={chatEndRef} />
         </div>
         <button
@@ -597,12 +619,20 @@ export default function ChatPage() {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="메시지를 입력하세요"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none"
+            placeholder={isLoading ? "답변을 기다리는 중..." : "메시지를 입력하세요"}
+            disabled={isLoading}
+            className={`flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none ${
+              isLoading ? 'bg-gray-100 text-gray-400' : ''
+            }`}
           />
           <button
             onClick={handleSend}
-            className="p-2 bg-[#fce1c8] text-[#7a3e0d] rounded-full hover:bg-[#ffcb8c]"
+            disabled={isLoading}
+            className={`p-2 rounded-full ${
+              isLoading 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                : 'bg-[#fce1c8] text-[#7a3e0d] hover:bg-[#ffcb8c]'
+            }`}
           >
             <Send size={18} />
           </button>
