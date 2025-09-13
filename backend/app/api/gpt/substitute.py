@@ -1,6 +1,7 @@
+
 from fastapi import APIRouter
 from pydantic import BaseModel
-from openai import AsyncOpenAI
+import openai
 import os
 from dotenv import load_dotenv
 import json
@@ -8,7 +9,7 @@ import re
 import asyncio
 
 load_dotenv()
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 router = APIRouter()
 
 class SubstituteRequest(BaseModel):
@@ -78,7 +79,7 @@ def normalize_parentheses(val: str) -> str:
 
 async def get_substitute_response(req: SubstituteRequest, strict=False):
     prompt = build_prompt(req, strict)
-    response = await client.chat.completions.create(
+    response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",  
         messages=[
             {"role": "system", "content": "당신은 한국 요리 전문가입니다. 한국인의 입맛과 일반적인 한국 가정의 재료 보유 현황을 잘 알고 있습니다."},
@@ -109,7 +110,7 @@ async def async_request_final_judgment(ingredient: str, amount: str, steps: list
         f"레시피 조리 순서:\n{steps_str}"
     )
 
-    response = await client.chat.completions.create(
+    response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "당신은 요리 전문가입니다."},

@@ -1,12 +1,13 @@
+
 from fastapi import APIRouter
 from pydantic import BaseModel
-from openai import OpenAI
+import openai
 import os
 from dotenv import load_dotenv
 import json
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 router = APIRouter()
 
 class ServingsRequest(BaseModel):
@@ -42,14 +43,8 @@ async def convert_servings(req: ServingsRequest):
             f"- step에선 인분에 따라 조정된 표현이 자연스럽게 반영되도록 작성하세요.\n\n"
             f"출력 형식:\n"
             f"""
-            {{
-            \"title\": \"{req.title}\",
-            \"serving\": \"{req.target_serving}\",
-            \"ingredients\": [\"재료1: 양\", \"재료2: 양\"],
-            \"steps\": [\"조리1\", \"조리2\"]
-            }}
-            """ +
-                        f"\n레시피 제목: {req.title}\n\n"
+            {{\n\"title\": \"{req.title}\",\n\"serving\": \"{req.target_serving}\",\n\"ingredients\": [\"재료1: 양\", \"재료2: 양\"],\n\"steps\": [\"조리1\", \"조리2\"]\n}}\n"""
+            f"\n레시피 제목: {req.title}\n\n"
             f"재료:\n{ingredients_text}\n\n"
             f"조리 순서:\n{steps_text}"
         )
@@ -64,7 +59,7 @@ async def convert_servings(req: ServingsRequest):
             {"role": "user", "content": prompt}
         ]
 
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.5,
@@ -72,28 +67,12 @@ async def convert_servings(req: ServingsRequest):
         )
 
         content = response.choices[0].message.content.strip()
-        parsed = json.loads(content)
+        try:
+            parsed = json.loads(content)
+        except Exception:
+            parsed = content
 
         parsed["title"] = req.title
-        
-        import re
-        from fractions import Fraction
-
-        def convert_mixed_fraction(text):
-            def repl(match):
-                whole = int(match.group(1))
-                frac = Fraction(match.group(2))
-                decimal = round(whole + float(frac), 1)
-                return str(decimal)
-            return re.sub(r'(\d+)\s+(\d/\d+)', repl, text)
-
-        parsed["ingredients"] = [
-            convert_mixed_fraction(item) for item in parsed["ingredients"]
-]
-
-        return {
-            "result": parsed
-        }
-
+        return {"result": parsed}
     except Exception as e:
         return {"error": str(e)}
