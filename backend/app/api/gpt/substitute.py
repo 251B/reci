@@ -122,43 +122,40 @@ async def async_request_final_judgment(ingredient: str, amount: str, steps: list
 
 async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, str]:
     collected_raw = []
-    max_attempts = 6  # 더 많은 시도로 품질 향상
+    max_attempts = 6  # 최대 시도 횟수
     attempts = 0
 
     def is_placeholder(value: str) -> bool:
-        # 더 정확한 플레이스홀더 감지
+        # 플레이스홀더 문자열 감지
         pattern = re.compile(r"(대체안\d*|정량|양|대체재|없음|생략\s*가능|대체\s*불가|대체불가|불가능|적절하지|모르겠)", re.IGNORECASE)
         return bool(pattern.search(value))
 
     def normalize_key(text: str) -> str:
-        # 재료명만 추출하여 중복 체크 (양과 단위는 유지)
+        # 재료명 정규화 (단위 제거)
         text = text.lower().strip()
         text = re.sub(r"\([^)]*\)", "", text)  # 괄호 제거
         
-        # 일반적인 단위들을 기준으로 재료명만 추출
+        # 단위 목록
         units = ['큰술', '큰스푼', 't', 'T', '작은술', '작은스푼', 'tsp', '개', '쪽', '조각', 'g', 'ml', 'kg', 'l']
         
-        # 단위 앞의 숫자와 단위를 제거
+        # 단위와 숫자 제거
         for unit in units:
             pattern = rf'\s*\d+\.?\d*\s*{re.escape(unit)}\s*'
             text = re.sub(pattern, '', text, flags=re.IGNORECASE)
         
-        # 남은 숫자들 제거
         text = re.sub(r'\d+\.?\d*', '', text)
-        text = re.sub(r'\s+', ' ', text)  # 여러 공백을 하나로
+        text = re.sub(r'\s+', ' ', text)
         
         return text.strip()
 
     def are_similar_ingredients(ing1: str, ing2: str) -> bool:
-        """두 재료가 비슷한지 확인 (중복 방지용)"""
+        # 재료 중복 확인
         norm1 = normalize_key(ing1)
         norm2 = normalize_key(ing2)
         
-        # 정확히 같은 재료명
         if norm1 == norm2:
             return True
             
-        # 하나가 다른 하나를 포함하는 경우 (예: "마늘" vs "마늘가루")
         if norm1 in norm2 or norm2 in norm1:
             return True
             
@@ -186,7 +183,7 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
             options = [v.strip() for v in val.split("|")]
             for opt in options:
                 if not is_placeholder(opt):
-                    # 기존에 수집된 재료와 유사한지 확인
+                    # 중복 재료 확인
                     is_duplicate = any(are_similar_ingredients(opt, existing) for existing in collected_raw)
                     
                     if not is_duplicate:
@@ -210,7 +207,7 @@ async def async_get_substitute(sub: str, req: SubstituteRequest) -> tuple[str, s
 @router.post("/substitute")
 async def recommend_substitute(req: SubstituteRequest):
     try:
-        # GPT에 개별 비동기 요청
+        # 비동기 요청 실행
         tasks = [async_get_substitute(sub, req) for sub in req.substitutes]
         results = await asyncio.gather(*tasks)
 
@@ -227,7 +224,7 @@ async def recommend_substitute(req: SubstituteRequest):
             original_val = v.strip()
 
             if key in already_handled:
-                continue  
+                continue
 
             if key in parsed_dict:
                 val = parsed_dict[key]

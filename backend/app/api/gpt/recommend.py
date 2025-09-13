@@ -17,7 +17,7 @@ class PromptRequest(BaseModel):
 @router.post("/recommend")
 async def recommend_recipe(req: PromptRequest):
     try:
-        # GPT로부터 재료 추출
+        # 재료 추출 프롬프트
         extract_prompt = [
             {
                 "role": "system",
@@ -55,7 +55,7 @@ async def recommend_recipe(req: PromptRequest):
                 "seen_recipe_ids": req.seen_recipe_ids,
             }
 
-        # 재료별 검색 → 레시피 모으기
+        # 재료별 레시피 검색
         all_docs = dict()
 
         for ing in ingredients:
@@ -68,7 +68,7 @@ async def recommend_recipe(req: PromptRequest):
                 doc = hit["document"]
                 all_docs[doc["id"]] = doc
 
-        # 실제 재료 포함 여부 확인
+        # 재료 매칭 확인
         fully_matched = []
         partial_matched = []
 
@@ -85,12 +85,12 @@ async def recommend_recipe(req: PromptRequest):
             elif matched:
                 partial_matched.append(doc)
 
-        # 이전에 본 거 제거
+        # 중복 제거
         unseen_fully = [r for r in fully_matched if r["id"] not in req.seen_recipe_ids]
         top_recipes = unseen_fully[:3]
         updated_seen = req.seen_recipe_ids + [r["id"] for r in top_recipes]
 
-        # fallback: 일부 재료 포함된 레시피
+        # 일부 매칭 레시피 사용
         if not top_recipes:
             unseen_partial = [r for r in partial_matched if r["id"] not in updated_seen]
             top_recipes = unseen_partial[:3]

@@ -3,7 +3,7 @@ from app.services.client import client
 
 router = APIRouter()
 
-@router.get("/title")  # /search/title 로 접근 가능
+@router.get("/title")  # 제목 검색 엔드포인트
 async def search_by_title(
     q: str = Query(...),
     page: int = Query(1),
