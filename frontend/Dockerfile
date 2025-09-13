@@ -25,8 +25,8 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Nginx 설정 파일 복사 (선택사항)
 # COPY nginx.conf /etc/nginx/nginx.conf
 
-# 포트 3000 노출
-EXPOSE 3000
+# 포트 80 노출
+EXPOSE 80
 
 # Nginx 실행
 CMD ["nginx", "-g", "daemon off;"]

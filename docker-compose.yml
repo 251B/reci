@@ -5,10 +5,11 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://recipick_user:recipick_password@db:5432/recipick_db
       - ENVIRONMENT=production
-      - DEBUG=False
       - API_HOST=0.0.0.0
       - API_PORT=8000
       - CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
@@ -21,7 +22,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - REACT_APP_API_URL=http://localhost:8000
     restart: unless-stopped
