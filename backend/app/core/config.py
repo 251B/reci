@@ -12,6 +12,10 @@ load_dotenv()
 class Settings:
     """애플리케이션 설정"""
     
+    # 환경 설정
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
+    
     # 데이터베이스 설정
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./users.db")
     
