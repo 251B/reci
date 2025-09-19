@@ -38,7 +38,7 @@ const ChatMessage = forwardRef(({ message, onAlternativeSelect, selectedAlternat
       {type === "recommendation" && (
         <div className="px-4 py-2 text-sm rounded-xl max-w-[75%] whitespace-pre-wrap bg-[#ffcb8c] text-[#7a3e0d] rounded-tl-none mt-1.5">
           <ul className="space-y-1">
-            {content.recipes.map((recipe) => {
+            {(Array.isArray(content?.recipes) ? content.recipes : []).map((recipe) => {
               let emoji = "🍽️"; // 기본값
 
               if (content.source === "difficulty-time") {

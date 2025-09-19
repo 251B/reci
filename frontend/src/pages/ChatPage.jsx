@@ -192,7 +192,15 @@ export default function ChatPage() {
   // 인분 변환 처리
   const handleServingConversion = async (userText) => {
     const servingMatch = userText.match(/(\d+)\s*(인분|명|인|배)/);
-    if (!servingMatch || !recipeData) return false;
+    if (!servingMatch) return false;
+    if (!recipeData) {
+      addBotMessage(
+        "text",
+        "레시피 정보가 없어 인분 변환을 할 수 없습니다."
+      );
+      setIsLoading(false);
+      return true; 
+    }
 
     const targetServing = `${servingMatch[1]}인분`;
     const res = await api.post("/gpt/servings", {
