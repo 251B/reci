@@ -28,7 +28,7 @@ export default function LoginPage() {
         email,
         password,
       });
-      localStorage.setItem("userId", res.data.userId);
+      localStorage.setItem("userId", res.data.data.userId);
       alert("로그인에 성공하였습니다!");
       navigate("/");
     } catch (err) {

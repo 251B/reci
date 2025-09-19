@@ -1,7 +1,7 @@
 
 import os
 import json
-from client import client
+from app.services.client import client
 
 def create_collection():
     schema = {
@@ -9,10 +9,13 @@ def create_collection():
         "fields": [
             {"name": "id", "type": "string"},
             {"name": "title", "type": "string"},
-            {"name": "ingredients", "type": "string[]", "facet": False},
-            {"name": "category", "type": "string", "facet": True},
-            {"name": "minutes", "type": "int32", "facet": True},
-            {"name": "instructions", "type": "string"}
+            {"name": "category", "type": "string"},
+            {"name": "serving", "type": "string"},
+            {"name": "image_url", "type": "string"},
+            {"name": "cook_time", "type": "string"},
+            {"name": "difficulty", "type": "string"},
+            {"name": "ingredients", "type": "string[]"},
+            {"name": "steps", "type": "string[]"}
         ]
     }
     try:
@@ -41,10 +44,13 @@ def upsert_recipes(all_recipes):
                 {
                     "id": str(recipe.get("id")),
                     "title": recipe.get("title", ""),
-                    "ingredients": recipe.get("ingredients", []),
                     "category": recipe.get("category", ""),
-                    "minutes": recipe.get("minutes", 0),
-                    "instructions": recipe.get("instructions", "")
+                    "serving": recipe.get("serving", ""),
+                    "image_url": recipe.get("image_url", ""),
+                    "cook_time": recipe.get("cook_time", ""),
+                    "difficulty": recipe.get("difficulty", ""),
+                    "ingredients": recipe.get("ingredients", []),
+                    "steps": recipe.get("steps", [])
                 }
                 for recipe in batch
             ]

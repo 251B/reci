@@ -85,7 +85,7 @@ export default function CategoryPage() {
 
   useEffect(() => {
     if (userId) {
-      // fetchBookmarks(); // 북마크 API 호출 주석처리
+       fetchBookmarks();
     }
   }, [userId]);
 
