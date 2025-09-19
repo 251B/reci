@@ -1,14 +1,14 @@
-
 from fastapi import APIRouter
 from pydantic import BaseModel
-import openai
 import os
 from dotenv import load_dotenv
 from app.services.client import client as ts_client
 import json
 
+from openai import OpenAI
+
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
 
 class CustomRecipe(BaseModel):
@@ -70,7 +70,7 @@ async def custom_recommend(req: CustomRecommendRequest):
         {"role": "user", "content": prompt}
     ]
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=0.7,

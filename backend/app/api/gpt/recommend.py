@@ -1,13 +1,14 @@
-
 from fastapi import APIRouter
 from pydantic import BaseModel
-import openai
 import os
 from dotenv import load_dotenv
 from app.services.client import client as ts_client
 
+# openai 1.0.0 이상 방식
+from openai import OpenAI
+
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
 
 class PromptRequest(BaseModel):
@@ -35,7 +36,8 @@ async def recommend_recipe(req: PromptRequest):
             {"role": "user", "content": req.message}
         ]
 
-        response = openai.ChatCompletion.create(
+        # openai 1.0.0 이상 방식
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=extract_prompt,
             temperature=0,

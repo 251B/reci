@@ -1,13 +1,13 @@
-
 from fastapi import APIRouter
 from pydantic import BaseModel
-import openai
 import os
 from dotenv import load_dotenv
 import json
 
+from openai import OpenAI
+
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
 
 class ServingsRequest(BaseModel):
@@ -59,7 +59,7 @@ async def convert_servings(req: ServingsRequest):
             {"role": "user", "content": prompt}
         ]
 
-        response = openai.ChatCompletion.create(
+        response = await client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.5,

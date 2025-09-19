@@ -278,6 +278,9 @@ export default function ChatPage() {
       seen_recipe_ids: seenRecipeIds,
     });
 
+    // 응답 구조 확인
+    console.log("recommend 응답:", res.data);
+
     const recipeList = res.data.recipes;
     setPreviousIngredients(res.data.ingredients || []);
     localStorage.setItem("previousIngredients", JSON.stringify(res.data.ingredients || []));
