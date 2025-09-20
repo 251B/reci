@@ -32,7 +32,7 @@ class Settings:
     # Typesense 설정
     TYPESENSE_HOST: str = os.getenv("TYPESENSE_HOST", "localhost")
     TYPESENSE_PORT: int = int(os.getenv("TYPESENSE_PORT", "8108"))
-    TYPESENSE_API_KEY: str = os.getenv("TYPESENSE_API_KEY", "xyz")
+    TYPESENSE_API_KEY: str = os.getenv("TYPESENSE_API_KEY", "reipick-typesense-key")
     
     # OpenAI 설정
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
