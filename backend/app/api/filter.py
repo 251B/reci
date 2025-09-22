@@ -40,9 +40,6 @@ async def filter_by_difficulty_time(
     # 필터 조건 조합
     filter_query = " && ".join(filters) if filters else ""
 
-    # 필터 쿼리 출력
-    print("Filter Query:", filter_query)
-
     try:
         # 타입센스 서버에 검색 요청
         result = client.collections["recipes"].documents.search({
@@ -52,7 +49,6 @@ async def filter_by_difficulty_time(
             "page": page,
             "per_page": per_page
         })
-        print("TypeSense Response:", result)  # 타입센스 응답 출력
 
         recipes = [
             {
@@ -62,9 +58,7 @@ async def filter_by_difficulty_time(
             }
             for hit in result["hits"]
         ]
-        print("Processed Recipes:", recipes)  # 가공된 데이터 출력
 
         return result  # 응답 반환
     except Exception as e:
-        print("Error:", str(e))
         return {"error": str(e)}
