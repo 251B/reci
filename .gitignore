@@ -34,9 +34,8 @@ yarn-error.log*
 # --- 테스트 및 커버리지 ---
 coverage/
 
-# --- 선택적으로 추가 가능 ---
-# !.vscode/extensions.json
-# logs/
+vscode/extensions.json
+logs/
 
 # --- 포트번호 관련 ---
 newcollection.py
