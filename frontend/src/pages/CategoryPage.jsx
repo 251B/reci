@@ -5,6 +5,7 @@ import Header from "../components/common/Header";
 import RecipeCard from "../components/recipe/RecipeCard";
 import { useBookmarks, useScrollToTop, useInfiniteScroll } from "../hooks";
 import api from "../utils/api";
+import CustomAlert from "../components/common/CustomAlert";
 
 export default function CategoryPage() {
   const location = useLocation();
@@ -13,11 +14,12 @@ export default function CategoryPage() {
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  
+
   // 북마크 훅 사용
   const userId = localStorage.getItem("userId");
-  const { bookmarkedIds, toggleBookmark, fetchBookmarks } = useBookmarks(userId);
-  
+  const { bookmarkedIds, toggleBookmark, fetchBookmarks, alertMessage, setAlertMessage } =
+    useBookmarks(userId);
+
   // 스크롤 훅 사용
   const [showTopBtn, scrollToTop] = useScrollToTop(200);
 
@@ -29,7 +31,7 @@ export default function CategoryPage() {
       return next;
     });
   }, []);
-  
+
   const lastItemRef = useInfiniteScroll(hasMore, fetchMoreRecipes);
 
   const params = new URLSearchParams(location.search);
@@ -59,7 +61,6 @@ export default function CategoryPage() {
       const res = await api.get(
         `/category/search?name=${encodeURIComponent(decodedName)}&page=${pageNum}&per_page=8`
       );
-      //console.log('카테고리 API 응답:', res.data);
       const newRecipes = res.data.recipes || [];
       setRecipes((prev) => {
         const seen = new Set(prev.map((r) => r.id));
@@ -70,8 +71,6 @@ export default function CategoryPage() {
         setHasMore(false);
       }
     } catch (err) {
-      //console.error('카테고리 API 에러:', err);
-      // 카테고리 로딩 실패 시 hasMore를 false로 설정
       setHasMore(false);
     }
   };
@@ -138,6 +137,11 @@ export default function CategoryPage() {
           )}
         </div>
 
+        {/* CustomAlert 추가 */}
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage("")} // 알림 닫기
+        />
 
         {showTopBtn && (
           <>
