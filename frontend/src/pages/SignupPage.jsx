@@ -2,12 +2,14 @@ import Header from "../components/common/Header";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { useState } from "react";
+import CustomAlert from "../components/common/CustomAlert"; // 커스텀 알림 추가
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [alertMessage, setAlertMessage] = useState(""); // 알림 메시지 상태 추가
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,15 +18,15 @@ export default function SignupPage() {
 
   const handleSignup = async () => {
     if (!email || !password || !confirm) {
-      alert("모든 항목을 입력해주세요.");
+      setAlertMessage("모든 항목을 입력해주세요."); // 커스텀 알림 메시지 설정
       return;
     }
     if (!isValidEmail(email)) {
-      alert("유효한 이메일 형식을 입력해주세요. 예: user@example.com");
+      setAlertMessage("유효한 이메일 형식을 입력해주세요. \n 예: user@example.com");
       return;
     }
     if (password !== confirm) {
-      alert("비밀번호가 일치하지 않습니다.");
+      setAlertMessage("비밀번호가 일치하지 않습니다.");
       return;
     }
 
@@ -33,15 +35,20 @@ export default function SignupPage() {
         email,
         password,
       });
-      alert("회원가입 성공! 로그인 페이지로 이동합니다.");
-      navigate("/login");
+      setAlertMessage("회원가입 성공! 로그인 페이지로 이동합니다."); // 성공 메시지
+      setTimeout(() => navigate("/login"), 2000); // 2초 후 로그인 페이지로 이동
     } catch (err) {
-      alert("회원가입 실패: " + err.response?.data?.detail);
+      setAlertMessage("회원가입 실패: " + err.response?.data?.detail);
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen items-center bg-[#f7f8fa]">
+      {/* CustomAlert 컴포넌트 추가 */}
+      <CustomAlert
+        message={alertMessage}
+        onClose={() => setAlertMessage("")} // 알림 닫기
+      />
       <div className="w-full max-w-md">
         <Header title="회원가입" showBack onBack={() => navigate(-1)} />
         <div className="p-6 mt-20 flex flex-col gap-6 items-center">

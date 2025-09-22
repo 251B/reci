@@ -6,6 +6,7 @@ import RecipeTTS from "../components/recipe/RecipeTTS";
 import RecipeTimer from "../components/recipe/RecipeTimer";
 import RecipeMemo from "../components/recipe/RecipeMemo";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import CustomAlert from "../components/common/CustomAlert"; // 커스텀 알림 추가
 import api from "../utils/api";
 
 function getStarsByDifficulty(difficulty) {
@@ -31,6 +32,7 @@ export default function RecipePage() {
   const [recipe, setRecipe] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [error, setError] = useState("");
+  const [alertMessage, setAlertMessage] = useState(""); // 알림 메시지 상태 추가
 
   const adjusted = location.state?.adjusted;
   const adjustedIngredients = location.state?.adjustedIngredients;
@@ -92,8 +94,7 @@ export default function RecipePage() {
 
   const toggleBookmark = async () => {
     if (!userId) {
-      alert("로그인이 필요합니다.");
-      navigate("/mypage");
+      setAlertMessage("로그인이 필요합니다."); // 커스텀 알림 메시지 설정
       return;
     }
 
@@ -128,6 +129,10 @@ export default function RecipePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 items-center">
+      <CustomAlert
+        message={alertMessage}
+        onClose={() => setAlertMessage("")} // 알림 닫기
+      />
       <div className="w-full max-w-md">
         <Header
           title={

@@ -21,7 +21,7 @@ export default function LoginPage() {
       return;
     }
     if (!isValidEmail(email)) {
-      setAlertMessage("유효한 이메일 형식을 입력해주세요. 예: user@example.com");
+      setAlertMessage("유효한 이메일 형식을 입력해주세요. \n 예: user@example.com");
       return;
     }
 

@@ -16,6 +16,7 @@ export const useMyPageData = (userId) => {
   const [recentRecipes, setRecentRecipes] = useState([]);
   const [topIngredients, setTopIngredients] = useState([]);
   const [cacheKey, setCacheKey] = useState("");
+  const [alertMessage, setAlertMessage] = useState(""); // 알림 메시지 상태 추가
 
   useEffect(() => {
     setIsLoggedIn(!!userId);
@@ -77,7 +78,7 @@ export const useMyPageData = (userId) => {
   const handleLogout = () => {
     localStorage.removeItem("userId");
     setIsLoggedIn(false);
-    alert("로그아웃 되었습니다.");
+    setAlertMessage("로그아웃 되었습니다."); // 커스텀 알림 메시지 설정
   };
 
   return {
@@ -86,5 +87,7 @@ export const useMyPageData = (userId) => {
     topIngredients,
     cacheKey,
     handleLogout,
+    alertMessage, // 알림 메시지 상태 반환
+    setAlertMessage, // 알림 메시지 상태 업데이트 함수 반환
   };
 };
