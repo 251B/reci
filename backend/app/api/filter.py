@@ -40,6 +40,9 @@ async def filter_by_difficulty_time(
     # 필터 조건 조합
     filter_query = " && ".join(filters) if filters else ""
 
+    # 필터 쿼리 출력
+    print("Filter Query:", filter_query)
+
     try:
         # 타입센스 서버에 검색 요청
         result = client.collections["recipes_gpt"].documents.search({
