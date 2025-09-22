@@ -1,27 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRight, Play, Pause, RotateCcw, SkipBack } from "lucide-react";
 
 export default function RecipeTTS({ steps, currentStepIndex, onStepChange }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isPaused, setIsPaused] = useState(false); // 일시정지 상태 추가
-
-  // speechSynthesis 상태 감지
-  useEffect(() => {
-    const checkSpeakingStatus = () => {
-      setIsSpeaking(speechSynthesis.speaking);
-      setIsPaused(speechSynthesis.paused);
-    };
-
-    const interval = setInterval(checkSpeakingStatus, 100);
-    return () => clearInterval(interval);
-  }, []);
+  const [isPaused, setIsPaused] = useState(false);
+  const utteranceRef = useRef(null); // 현재 발화를 저장하는 참조
 
   const speakSteps = (step) => {
+    // 이전 발화 취소
+    speechSynthesis.cancel();
+
+    // 새로운 발화 생성
     const utterance = new SpeechSynthesisUtterance(step);
     utterance.lang = "ko-KR";
 
+    // 이벤트 핸들러 등록
     utterance.onstart = () => {
       setIsSpeaking(true);
+      setIsPaused(false);
+    };
+    utterance.onpause = () => {
+      setIsPaused(true);
+    };
+    utterance.onresume = () => {
       setIsPaused(false);
     };
     utterance.onend = () => {
@@ -33,18 +34,17 @@ export default function RecipeTTS({ steps, currentStepIndex, onStepChange }) {
       setIsPaused(false);
     };
 
+    // 발화 시작
     speechSynthesis.speak(utterance);
+    utteranceRef.current = utterance; // 현재 발화를 참조로 저장
   };
 
   const pauseResumeSpeaking = () => {
     if (speechSynthesis.speaking && !speechSynthesis.paused) {
       speechSynthesis.pause();
-      setIsPaused(true); // 일시정지 상태로 설정
     } else if (speechSynthesis.paused) {
       speechSynthesis.resume();
-      setIsPaused(false); // 재생 상태로 설정
     } else {
-      // 말하고 있지 않으면 현재 단계 읽기 시작
       speakSteps(steps[currentStepIndex]);
     }
   };
@@ -85,6 +85,13 @@ export default function RecipeTTS({ steps, currentStepIndex, onStepChange }) {
       }, 100);
     }
   };
+
+  useEffect(() => {
+    // 컴포넌트 언마운트 시 발화 취소
+    return () => {
+      speechSynthesis.cancel();
+    };
+  }, []);
 
   return (
     <div className="flex items-center space-x-2">
