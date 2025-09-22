@@ -59,7 +59,7 @@ export default function CategoryPage() {
       const res = await api.get(
         `/category/search?name=${encodeURIComponent(decodedName)}&page=${pageNum}&per_page=8`
       );
-      console.log('카테고리 API 응답:', res.data);
+      //console.log('카테고리 API 응답:', res.data);
       const newRecipes = res.data.recipes || [];
       setRecipes((prev) => {
         const seen = new Set(prev.map((r) => r.id));
@@ -70,7 +70,7 @@ export default function CategoryPage() {
         setHasMore(false);
       }
     } catch (err) {
-      console.error('카테고리 API 에러:', err);
+      //console.error('카테고리 API 에러:', err);
       // 카테고리 로딩 실패 시 hasMore를 false로 설정
       setHasMore(false);
     }

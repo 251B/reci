@@ -62,7 +62,7 @@ export default function MainPage() {
           return [...prev, ...filtered];
         });
       } catch (err) {
-        console.error("검색 오류:", err);
+        //console.error("검색 오류:", err);
         setHasMore(false);
       }
     };

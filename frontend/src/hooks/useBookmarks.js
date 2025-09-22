@@ -24,7 +24,7 @@ export const useBookmarks = (userId) => {
       // API 응답 구조: res.data.data.recipe_ids
       setBookmarkedIds(res.data.data?.recipe_ids?.map(id => Number(id)) || []);
     } catch (err) {
-      console.error("찜 목록 불러오기 실패:", err);
+      //console.error("찜 목록 불러오기 실패:", err);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +53,7 @@ export const useBookmarks = (userId) => {
         setBookmarkedIds((prev) => [...prev, Number(recipeId)]);
       }
     } catch (err) {
-      console.error("찜 처리 에러:", err.response?.data?.detail);
+      //console.error("찜 처리 에러:", err.response?.data?.detail);
     }
   }, [userId, bookmarkedIds, navigate]);
 

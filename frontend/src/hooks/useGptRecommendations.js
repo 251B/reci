@@ -89,16 +89,16 @@ export const useGptRecommendations = (userId, cacheKey) => {
 
       setGptRecommendations(result);
     } catch (err) {
-      console.error("GPT 추천 요청 실패:", err);
-      // 더 구체적인 에러 정보 로깅
-      if (err.response) {
-        console.error("API 응답 에러:", err.response.status, err.response.data);
-      } else if (err.request) {
-        console.error("네트워크 에러:", err.message);
-      } else {
-        console.error("기타 에러:", err.message);
-      }
-      setGptRecommendations([]);
+      // console.error("GPT 추천 요청 실패:", err);
+      // // 더 구체적인 에러 정보 로깅
+      // if (err.response) {
+      //   console.error("API 응답 에러:", err.response.status, err.response.data);
+      // } else if (err.request) {
+      //   console.error("네트워크 에러:", err.message);
+      // } else {
+      //   console.error("기타 에러:", err.message);
+      // }
+      // setGptRecommendations([]);
     } finally {
       setIsLoading(false);
     }

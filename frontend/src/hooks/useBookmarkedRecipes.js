@@ -24,7 +24,7 @@ export function useBookmarkedRecipes(bookmarkedIds) {
       const recipeResults = await Promise.all(recipePromises);
       setRecipes(recipeResults);
     } catch (err) {
-      console.error("찜한 레시피 불러오기 실패:", err);
+      //console.error("찜한 레시피 불러오기 실패:", err);
       setError("레시피를 불러오는데 실패했습니다.");
       setRecipes([]);
     } finally {
