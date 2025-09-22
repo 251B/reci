@@ -6,6 +6,7 @@ import RecipeCard from "../components/recipe/RecipeCard";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useScrollToTop, useInfiniteScroll } from "../hooks";
 import api from "../utils/api";
+import CustomAlert from "../components/common/CustomAlert"; 
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -15,14 +16,13 @@ export default function MainPage() {
   const [hasMore, setHasMore] = useState(false);
   const containerRef = useRef();
   const [showTopBtn, scrollToTop] = useScrollToTop(200);
-  
+  const [alertMessage, setAlertMessage] = useState(""); // 알림 메시지 상태 추가
 
-  
   // 무한 스크롤 훅 사용
   const fetchMoreResults = useCallback(() => {
     setPage((prev) => prev + 1);
   }, []);
-  
+
   const lastResultRef = useInfiniteScroll(hasMore, fetchMoreResults);
 
   const foodCategories = [
@@ -69,8 +69,6 @@ export default function MainPage() {
     fetchResults();
   }, [searchText, page]);
 
-
-
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (containerRef.current) {
@@ -78,8 +76,18 @@ export default function MainPage() {
     }
   };
 
+  const showAlert = (message) => {
+    setAlertMessage(message);
+  };
+
   return (
     <div ref={containerRef} className="flex flex-col min-h-screen">
+      {/* CustomAlert 컴포넌트 */}
+      <CustomAlert
+        message={alertMessage}
+        onClose={() => setAlertMessage("")}
+      />
+
       <main className="flex-grow bg-[#F7F8FA]">
         <div className="relative w-full max-w-md mx-auto bg-[#F7F8FA] text-sm">
           <Header
@@ -175,9 +183,9 @@ export default function MainPage() {
           )}
         </div>
       </main>
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50">
-          <Footer />
-        </div>
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50">
+        <Footer showAlert={showAlert} /> {/* showAlert 함수 전달 */}
+      </div>
     </div>
   );
 }

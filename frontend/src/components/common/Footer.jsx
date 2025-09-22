@@ -3,17 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react"; 
 import CustomAlert from "./CustomAlert"; 
 
-export default function Footer() {
+export default function Footer({ showAlert }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [alertMessage, setAlertMessage] = useState(""); 
 
   const isActive = (path) => location.pathname === path;
 
   const goToBookmarks = () => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      setAlertMessage("로그인이 필요합니다."); // 커스텀 알림 메시지 설정
+      showAlert("로그인이 필요합니다."); // showAlert 호출
     } else {
       navigate("/bookmarks");
     }
