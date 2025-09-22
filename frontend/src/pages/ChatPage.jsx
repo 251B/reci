@@ -108,17 +108,13 @@ export default function ChatPage() {
 
     const res = await api.get("/filter/difficulty-time", {
       params: {
-        ...(difficulty && { difficulty }),
-        ...(cookTimeString
-          ? { cook_time: cookTimeString }
-          : maxTime !== null && { max_time: `${filterOperator}${maxTime}` }),
+        difficulty,
+        max_time: `${filterOperator}${maxTime}`,
         page: 1,
         per_page: 5,
-        exclude_ids: seenRecipeIds,
       },
     });
-
-    console.log("API Response:", res.data);
+    console.log("API Response:", res.data);  // API 응답 출력
 
     const recipes = res.data.recipes || [];
     const botMessage = {
