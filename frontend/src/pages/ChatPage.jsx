@@ -99,13 +99,6 @@ export default function ChatPage() {
       filterOperator = ">=";
     }
 
-    // 디버깅: 필터 조건 확인
-    console.log({
-      difficulty,
-      maxTime: cookTimeString ? null : `${filterOperator}${maxTime}`,
-      cookTime: cookTimeString || null,
-    });
-
     setLastFilterCondition({
       difficulty,
       maxTime: cookTimeString ? null : `${filterOperator}${maxTime}`,
@@ -123,9 +116,6 @@ export default function ChatPage() {
         exclude_ids: seenRecipeIds,
       },
     });
-
-    // 디버깅: API 응답 확인
-    console.log(res.data);
 
     const recipes = res.data.recipes || [];
     const botMessage = {

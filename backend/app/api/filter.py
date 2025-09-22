@@ -15,26 +15,33 @@ async def filter_by_difficulty_time(
 ):
     filters = []
 
+    # 난이도 필터 추가
     if difficulty:
-        filters.append(f"difficulty:={difficulty}")
-    if max_time is not None:
-      import re
-      match = re.match(r"(>=|<=|>|<)?(\d+)", str(max_time))
-      if match:
-        operator = match.group(1) or "<="
-        value = match.group(2)
-        filters.append(f"cook_time_minutes:{operator}{value}")
-    
+        filters.append(f"difficulty:='{difficulty}'")
+
+    # 최대 시간 필터 추가
+    if max_time:
+        import re
+        match = re.match(r"(>=|<=|>|<)?(\d+)", str(max_time))
+        if match:
+            operator = match.group(1) or "<="
+            value = match.group(2)
+            filters.append(f"cook_time_minutes:{operator}{value}")
+
+    # 조리 시간 필터 추가
     if cook_time:
         filters.append(f"cook_time:='{cook_time}'")
 
+    # 제외할 ID 필터 추가
     if exclude_ids:
         for eid in exclude_ids:
             filters.append(f"id:!={eid}")
 
+    # 필터 조건 조합
     filter_query = " && ".join(filters) if filters else ""
 
     try:
+        # 타입센스 서버에 검색 요청
         result = client.collections["recipes_gpt"].documents.search({
             "q": "*",
             "query_by": "title",
@@ -43,6 +50,7 @@ async def filter_by_difficulty_time(
             "per_page": per_page
         })
 
+        # 검색 결과 처리
         recipes = [
             {
                 "id": hit["document"]["id"],
