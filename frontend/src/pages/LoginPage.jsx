@@ -1,4 +1,5 @@
 import Header from "../components/common/Header";
+import CustomAlert from "../components/common/CustomAlert";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { useState } from "react";
@@ -7,6 +8,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,11 +17,11 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("이메일과 비밀번호를 입력해주세요.");
+      setAlertMessage("이메일과 비밀번호를 입력해주세요.");
       return;
     }
     if (!isValidEmail(email)) {
-      alert("유효한 이메일 형식을 입력해주세요. 예: user@example.com");
+      setAlertMessage("유효한 이메일 형식을 입력해주세요. 예: user@example.com");
       return;
     }
 
@@ -29,15 +31,19 @@ export default function LoginPage() {
         password,
       });
       localStorage.setItem("userId", res.data.data.userId);
-      alert("로그인에 성공하였습니다!");
+      setAlertMessage("로그인에 성공하였습니다!");
       navigate("/");
     } catch (err) {
-      alert("로그인 실패: " + err.response?.data?.detail);
+      setAlertMessage("로그인 실패: " + err.response?.data?.detail);
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen items-center bg-[#f7f8fa]">
+      <CustomAlert
+        message={alertMessage}
+        onClose={() => setAlertMessage("")}
+      />
       <div className="w-full max-w-md">
         <Header title="로그인" showBack onBack={() => navigate(-1)} />
         <div className="p-6 mt-20 flex flex-col gap-6 items-center">
