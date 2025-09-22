@@ -73,6 +73,11 @@ export default function ChatPage() {
     const timeMatch = userText.match(/(\d+)\s*분\s*(이내|이상|넘는|초과|이하)?/);
     const hourMatch = userText.match(/(\d+)\s*시간\s*(이내|이상|넘는|초과|이하)?/);
 
+    console.log("User Input:", userText);
+    console.log("Level Match:", levelMatch);
+    console.log("Time Match:", timeMatch);
+    console.log("Hour Match:", hourMatch);
+
     if (!levelMatch && !timeMatch && !hourMatch) return false;
 
     const difficulty = levelMatch?.[1];
@@ -99,11 +104,7 @@ export default function ChatPage() {
       filterOperator = ">=";
     }
 
-    setLastFilterCondition({
-      difficulty,
-      maxTime: cookTimeString ? null : `${filterOperator}${maxTime}`,
-      cookTime: cookTimeString || null,
-    });
+    console.log("Parsed Filters:", { difficulty, maxTime, cookTimeString });
 
     const res = await api.get("/filter/difficulty-time", {
       params: {
@@ -116,6 +117,8 @@ export default function ChatPage() {
         exclude_ids: seenRecipeIds,
       },
     });
+
+    console.log("API Response:", res.data);
 
     const recipes = res.data.recipes || [];
     const botMessage = {
