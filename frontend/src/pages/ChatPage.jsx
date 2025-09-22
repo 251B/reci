@@ -114,29 +114,36 @@ export default function ChatPage() {
         per_page: 5,
       },
     });
-    console.log("API Response:", res.data);  // API 응답 출력
+    console.log("API Response:", res.data); // API 응답 출력
 
-    const recipes = res.data.recipes || [];
+    const recipes = res.data.hits.map(hit => ({
+      id: hit.document.id,
+      title: hit.document.title,
+      image_url: hit.document.image_url,
+    }));
+    console.log("Recipes:", recipes); // 변환된 데이터 확인
+
     const botMessage = {
       sender: "bot",
       type: recipes.length > 0 ? "recommendation" : "text",
-      content:
-        recipes.length > 0
-          ? { 
-              recipes, 
-              source: "difficulty-time",
-              filterCondition: { difficulty, maxTime, cookTime: cookTimeString }
-            }
-          : `${difficulty || ""} ${cookTimeString
+      content: recipes.length > 0
+        ? {
+            recipes,
+            source: "difficulty-time",
+            filterCondition: { difficulty, maxTime, cookTime: cookTimeString },
+          }
+        : `${difficulty || ""} ${cookTimeString
             ? `(조리 시간: ${cookTimeString})`
             : maxTime
-              ? `(${filterOperator}${maxTime}분)`
-              : ""
+            ? `(${filterOperator}${maxTime}분)`
+            : ""
           } 요리를 찾지 못했어요.`,
       time: getCurrentTime(),
     };
 
+    // 메시지 추가
     addBotMessage(botMessage.type, botMessage.content);
+
     return true;
   };
 
