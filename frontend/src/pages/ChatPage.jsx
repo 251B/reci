@@ -114,6 +114,15 @@ export default function ChatPage() {
       image_url: hit.document.image_url,
     }));
 
+    // 필터 조건 저장
+    setLastFilterCondition({
+      difficulty,
+      maxTime: `${filterOperator}${maxTime}`,
+      cookTime: cookTimeString,
+    });
+    setFilterPage(1); // 페이지 초기화
+    setSeenRecipeIds(recipes.map(recipe => recipe.id)); // 본 레시피 ID 저장
+
     const botMessage = {
       sender: "bot",
       type: recipes.length > 0 ? "recommendation" : "text",
@@ -159,8 +168,14 @@ export default function ChatPage() {
       },
     });
 
-    const recipes = res.data.recipes || [];
-    setFilterPage(nextPage);
+    const recipes = res.data.hits.map(hit => ({
+      id: hit.document.id,
+      title: hit.document.title,
+      image_url: hit.document.image_url,
+    }));
+
+    setFilterPage(nextPage); // 페이지 증가
+    setSeenRecipeIds(prev => [...prev, ...recipes.map(recipe => recipe.id)]); // 본 레시피 ID 추가
 
     const botMessage = {
       sender: "bot",
@@ -169,11 +184,7 @@ export default function ChatPage() {
         recipes.length > 0 ? { 
           recipes, 
           source: "difficulty-time",
-          filterCondition: {
-            difficulty: lastFilterCondition.difficulty,
-            maxTime: lastFilterCondition.maxTime,
-            cookTime: lastFilterCondition.cookTime
-          }
+          filterCondition: lastFilterCondition,
         } : "더 이상 추천할 레시피가 없어요!",
       time: getCurrentTime(),
     };
